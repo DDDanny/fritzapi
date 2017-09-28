@@ -348,7 +348,7 @@ module.exports.checkSession = function(sid, options)
 };
 
 //internal check session via body
-verifySession(body)
+function verifySession(body)
 {
 	var sessionID = body.match("<SID>(.*?)</SID>")[1];
 	if (sessionID === "0000000000000000") {
