@@ -1,7 +1,5 @@
 # fritzapi
-[![NPM Version](https://img.shields.io/npm/v/fritzapi.svg)](https://www.npmjs.com/package/fritzapi)
-[![Build status](https://travis-ci.org/andig/fritzapi.svg?branch=master)](https://travis-ci.org/andig/fritzapi)
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=HWZTN5AU8LSUC)
+[![Build status](https://travis-ci.org/DDDanny/fritzapi.svg?branch=caching)](https://travis-ci.org/DDDanny/fritzapi.svg?branch=caching)
 
 Home automation node API for Fritz!Box, Fritz!DECT and FRITZ!Powerline devices. 
 

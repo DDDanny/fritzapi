@@ -402,6 +402,7 @@ module.exports.getDeviceList = function(sid, options)
 // get AINs by a functionmask from fritzbox or from given options.devicelist
 // for fritzBit choose from FUNCTION_
 module.exports.getListByFunction = function(sid, options, fritzBit)
+{
 	/* jshint laxbreak:true */
 	
 	var bitSupported = FUNCTION_ALARM //could be move to export
