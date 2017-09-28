@@ -405,23 +405,23 @@ module.exports.getListByFunction = function(sid, options, fritzBit)
 {
 	/* jshint laxbreak:true */
 	
-	var bitSupported = FUNCTION_ALARM //could be move to export
-		& FUNCTION_THERMOSTAT
-		& FUNCTION_ENERGYMETER
-		& FUNCTION_TEMPERATURESENSOR
-		& FUNCTION_OUTLET
-		& FUNCTION_DECTREPEATER;
+	var bitSupported = Fritz.FUNCTION_ALARM //could be move to export
+		& Fritz.FUNCTION_THERMOSTAT
+		& Fritz.FUNCTION_ENERGYMETER
+		& Fritz.FUNCTION_TEMPERATURESENSOR
+		& Fritz.FUNCTION_OUTLET
+		& Fritz.FUNCTION_DECTREPEATER;
 
 	if (!bitSupported & fritzBit) return Promise.reject(new Error('Unknown Function Bit' + fritzBit) + '!');
 
-	if (!(options && options.deviceList) && fritzBit == fritzapi.FUNCTION_OUTLET) {
+	if (!(options && options.deviceList) && fritzBit == Fritz.FUNCTION_OUTLET) {
 		// no devicelist given,  get switches direct
 		return getOutletList(sid, options);
 	}
 	
 	deviceList = options && options.deviceList
 		? Promise.resolve(options.deviceList) // get from cached
-		: fritzapi.getDeviceList(sid, options); // retrieve via all devices
+		: getDeviceList(sid, options); // retrieve via all devices
 	
 	return deviceList.then(function(allDevices) {
 		var devices = allDevices.filter(function(device) {
@@ -455,7 +455,7 @@ module.exports.getDevice = function(sid, ain, options)
 // get AINs of all temperature supported devices from fritzbox or from given options.devicelist */
 module.exports.getTemperatureSensorsList = function(sid, options)
 {
-	return getListByFunction(sid, options, fritzapi.FUNCTION_TEMPERATURESENSOR);
+	return getListByFunction(sid, options, Fritz.FUNCTION_TEMPERATURESENSOR);
 };
 
 // get temperature- both switches and thermostats are supported, but not powerline modules
@@ -482,7 +482,7 @@ module.exports.getPresence = function(sid, ain, options)
 // get AINs of all switch supported devices from fritzbox or from given options.devicelist
 module.exports.getSwitchList = function(sid, options)
 {
-	return getListByFunction(sid, options, fritzapi.FUNCTION_OUTLET);
+	return getListByFunction(sid, options, Fritz.FUNCTION_OUTLET);
 };
 
 // get switch list without caching
@@ -559,7 +559,7 @@ module.exports.getSwitchName = function(sid, ain, options)
 // get AINs of all dect heater controls from fritzbox or from given options.devicelist
 module.exports.getValveList = function(sid, options)
 {
-	return getListByFunction(sid, options, fritzapi.FUNCTION_THERMOSTAT);
+	return getListByFunction(sid, options, Fritz.FUNCTION_THERMOSTAT);
 };
 
 
@@ -634,7 +634,7 @@ module.exports.getBatteryCharge = function(sid, ain, options)
 // get AINs of all dect repeaters from fritzbox or from given options.devicelist
 module.exports.getDectRepeaterList = function(sid, options)
 {
-	return getListByFunction(sid, options, fritzapi.FUNCTION_DECTREPEATER);
+	return getListByFunction(sid, options, Fritz.FUNCTION_DECTREPEATER);
 };
 
 /*
@@ -644,7 +644,7 @@ module.exports.getDectRepeaterList = function(sid, options)
 // get AINs of all all energy meters from fritzbox or from given options.devicelist */
 module.exports.getEnergyMeterList = function(sid, options)
 {
-	return getListByFunction(sid, options, fritzapi.FUNCTION_ENERGYMETER);
+	return getListByFunction(sid, options, Fritz.FUNCTION_ENERGYMETER);
 };
 
 /*
@@ -654,7 +654,7 @@ module.exports.getEnergyMeterList = function(sid, options)
 // get AINs of all all alarm supported devices from fritzbox or from given options.devicelist
 module.exports.getAlarmList = function(sid, options)
 {
-	return getListByFunction(sid, options, fritzapi.FUNCTION_ALARM);
+	return getListByFunction(sid, options, Fritz.FUNCTION_ALARM);
 };
 
 /*
