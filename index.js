@@ -433,7 +433,7 @@ module.exports.getListByFunction = function(sid, options, fritzBit)
 
 		return devices;
 	});
-}
+};
 
 // get single device
 module.exports.getDevice = function(sid, ain, options)
@@ -456,7 +456,7 @@ module.exports.getDevice = function(sid, ain, options)
 module.exports.getTemperatureSensorsList = function(sid, options)
 {
 	return getListByFunction(sid, options, fritzapi.FUNCTION_TEMPERATURESENSOR);
-}
+};
 
 // get temperature- both switches and thermostats are supported, but not powerline modules
 module.exports.getTemperature = function(sid, ain, options)
@@ -483,7 +483,7 @@ module.exports.getPresence = function(sid, ain, options)
 module.exports.getSwitchList = function(sid, options)
 {
 	return getListByFunction(sid, options, fritzapi.FUNCTION_OUTLET);
-}
+};
 
 // get switch list without caching
 module.exports.getOutletList = function(sid, options)
@@ -560,7 +560,7 @@ module.exports.getSwitchName = function(sid, ain, options)
 module.exports.getValveList = function(sid, options)
 {
 	return getListByFunction(sid, options, fritzapi.FUNCTION_THERMOSTAT);
-}
+};
 
 
 // get the thermostats
@@ -635,7 +635,7 @@ module.exports.getBatteryCharge = function(sid, ain, options)
 module.exports.getDectRepeaterList = function(sid, options)
 {
 	return getListByFunction(sid, options, fritzapi.FUNCTION_DECTREPEATER);
-}
+};
 
 /*
  * Energy
@@ -645,7 +645,7 @@ module.exports.getDectRepeaterList = function(sid, options)
 module.exports.getEnergyMeterList = function(sid, options)
 {
 	return getListByFunction(sid, options, fritzapi.FUNCTION_ENERGYMETER);
-}
+};
 
 /*
  * Alarms
@@ -655,7 +655,7 @@ module.exports.getEnergyMeterList = function(sid, options)
 module.exports.getAlarmList = function(sid, options)
 {
 	return getListByFunction(sid, options, fritzapi.FUNCTION_ALARM);
-}
+};
 
 /*
  * WLAN
