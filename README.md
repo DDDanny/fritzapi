@@ -18,14 +18,24 @@ Home automation node API for Fritz!Box, Fritz!DECT and FRITZ!Powerline devices.
 - Get device `getDevice` >Fritz!OS 6.10
 - Get temperature `getTemperature` - polyfill
 - Get presence `getPresence` - polyfill
+- Get all devices AINs that support a specific AVM function like temperatures etc `getListByFunction`
+the functions are 
+`Fritz.ALARM` - alarm sensor (no device yet - maybe a dect based window open recognition in future etc.)
+`Fritz.THERMOSTAT` - valves (AVM Fritz!DECT 300 or CometDECT)
+`Fritz.ENERGYMETER` - switches like AVM Fritz!DECT 200/210
+`Fritz.TEMPERATURESENSOR` - devices that support reading temperature (`getTemperature`)
+`Fritz.OUTLET` - switches like switches like AVM Fritz!DECT 200/210 and e.g. FRITZ!Powerline 546E WLAN
+`Fritz.DECTREPEATER` - e.g. AVM Fritz!DECT 100
+cache: You can provide a devicelist in `options.devicelist` paramater to work on this list as cache. Otherwise data will be retrieved internally via `getDeviceList` / `getOutletList`
 
 **Note**
-
+- get list cached `getTemperatureSensorsList` retrieves all device AINs that supports a `getTemperature`
 `getTemperature` is not available on the FRITZ!Powerline 546E WLAN set and will always return `NaN`.
 
 ### Fritz!DECT 200 and 210 outlet functions (includes FRITZ!Powerline 546E)
 
-- Get list `getSwitchList`
+- Get list cached `getSwitchList`
+- Get list `getOutletList`
 - Get state `getSwitchState`
 - Set on `setSwitchOn`
 - Set off `setSwitchOff`
@@ -39,13 +49,14 @@ For controlling AVM Fritz!DECT 200 devices the actuator identification number (A
 `getTemperature` is not available for switch groups that can be created through the Fritz!Box user interface.
 
 ### Fritz!DECT 100 functions
-
+- Get list cached `getDectRepeaterList`
 The Fritz!DECT 100 DECT repeater AIN does only appear in the `getDeviceList` output. It supports retrieving the repeater's temperature.
 
 ### Fritz!DECT 300 and CometDECT thermostat functions
 
 Thermostat functions are only available as of Fritz!OS 6.36
 
+- Get list cached `getValveList`
 - Get list `getThermostatList` - polyfill
 - Set target temperature `setTempTarget`, supports 'ON'/'OFF' to enable/disable thermostat
 - Get target temperature `getTempTarget`

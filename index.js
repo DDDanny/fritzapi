@@ -35,6 +35,7 @@ function Fritz(username, password, uri) {
 }
 
 // functionbitmask
+Fritz.ALARM = module.exports.FUNCTION_ALARM;
 Fritz.THERMOSTAT = module.exports.FUNCTION_THERMOSTAT;
 Fritz.ENERGYMETER = module.exports.FUNCTION_ENERGYMETER;
 Fritz.TEMPERATURESENSOR = module.exports.FUNCTION_TEMPERATURESENSOR;
@@ -109,7 +110,7 @@ Fritz.prototype = {
     },
 
     getSwitchList: function() {
-        return this.call(module.exports.getSwitchList);
+        return this.call(module.exports.getOutletList);
     },
 
     getSwitchState: function(ain) {
@@ -309,6 +310,7 @@ module.exports.MIN_TEMP = MIN_TEMP;
 module.exports.MAX_TEMP = MAX_TEMP;
 
 // functions bitmask
+module.exports.FUNCTION_ALARM               = 1 << 4;  // Alarm Sensor
 module.exports.FUNCTION_THERMOSTAT          = 1 << 6;  // Comet DECT, Heizkostenregler
 module.exports.FUNCTION_ENERGYMETER         = 1 << 7;  // Energie Messgerät
 module.exports.FUNCTION_TEMPERATURESENSOR   = 1 << 8;  // Temperatursensor
@@ -397,6 +399,41 @@ module.exports.getDeviceList = function(sid, options)
     });
 };
 
+// get AINs by a functionmask from fritzbox or from given options.devicelist
+// for fritzBit choose from FUNCTION_
+module.exports.getListByFunction = function(sid, options, fritzBit)
+	/* jshint laxbreak:true */
+	
+	var bitSupported = FUNCTION_ALARM //could be move to export
+		& FUNCTION_THERMOSTAT
+		& FUNCTION_ENERGYMETER
+		& FUNCTION_TEMPERATURESENSOR
+		& FUNCTION_OUTLET
+		& FUNCTION_DECTREPEATER;
+
+	if (!bitSupported & fritzBit) return Promise.reject(new Error('Unknown Function Bit' + fritzBit) + '!');
+
+	if (!(options && options.deviceList) && fritzBit == fritzapi.FUNCTION_OUTLET) {
+		// no devicelist given,  get switches direct
+		return getOutletList(sid, options);
+	}
+	
+	deviceList = options && options.deviceList
+		? Promise.resolve(options.deviceList) // get from cached
+		: fritzapi.getDeviceList(sid, options); // retrieve via all devices
+	
+	return deviceList.then(function(allDevices) {
+		var devices = allDevices.filter(function(device) {
+			return device.functionbitmask & fritzBit;
+		}).map(function(device) {
+			// fix ain, no gaps
+			return device.identifier.replace(/\s/g, '');
+		});
+
+		return devices;
+	});
+}
+
 // get single device
 module.exports.getDevice = function(sid, ain, options)
 {
@@ -413,6 +450,12 @@ module.exports.getDevice = function(sid, ain, options)
         return device || Promise.reject();
     });
 };
+
+// get AINs of all temperature supported devices from fritzbox or from given options.devicelist */
+module.exports.getTemperatureSensorsList = function(sid, options)
+{
+	return getListByFunction(sid, options, fritzapi.FUNCTION_TEMPERATURESENSOR);
+}
 
 // get temperature- both switches and thermostats are supported, but not powerline modules
 module.exports.getTemperature = function(sid, ain, options)
@@ -435,8 +478,14 @@ module.exports.getPresence = function(sid, ain, options)
  * Switches
  */
 
-// get switch list
+// get AINs of all switch supported devices from fritzbox or from given options.devicelist
 module.exports.getSwitchList = function(sid, options)
+{
+	return getListByFunction(sid, options, fritzapi.FUNCTION_OUTLET);
+}
+
+// get switch list without caching
+module.exports.getOutletList = function(sid, options)
 {
     return executeCommand(sid, 'getswitchlist', null, options).then(function(res) {
         // force empty array on empty result
@@ -506,25 +555,17 @@ module.exports.getSwitchName = function(sid, ain, options)
  * Thermostats
  */
 
-// get the switch list
+// get AINs of all dect heater controls from fritzbox or from given options.devicelist
+module.exports.getValveList = function(sid, options)
+{
+	return getListByFunction(sid, options, fritzapi.FUNCTION_THERMOSTAT);
+}
+
+
+// get the thermostats
 module.exports.getThermostatList = function(sid, options)
 {
-    /* jshint laxbreak:true */
-    var deviceList = options && options.deviceList
-        ? Promise.resolve(options.deviceList)
-        : module.exports.getDeviceList(sid, options);
-
-    return deviceList.then(function(devices) {
-        // get thermostats- right now they're only available via the XML api
-        var thermostats = devices.filter(function(device) {
-            return device.functionbitmask & module.exports.FUNCTION_THERMOSTAT;
-        }).map(function(device) {
-            // fix ain
-            return device.identifier.replace(/\s/g, '');
-        });
-
-        return thermostats;
-    });
+    return getValveList(); 
 };
 
 // set target temperature (Solltemperatur)
@@ -585,6 +626,35 @@ module.exports.getBatteryCharge = function(sid, ain, options)
     });
 };
 
+/*
+ * Dect Repeaters
+ */
+
+// get AINs of all dect repeaters from fritzbox or from given options.devicelist
+module.exports.getDectRepeaterList = function(sid, options)
+{
+	return getListByFunction(sid, options, fritzapi.FUNCTION_DECTREPEATER);
+}
+
+/*
+ * Energy
+ */
+
+// get AINs of all all energy meters from fritzbox or from given options.devicelist */
+module.exports.getEnergyMeterList = function(sid, options)
+{
+	return getListByFunction(sid, options, fritzapi.FUNCTION_ENERGYMETER);
+}
+
+/*
+ * Alarms
+ */
+
+// get AINs of all all alarm supported devices from fritzbox or from given options.devicelist
+module.exports.getAlarmList = function(sid, options)
+{
+	return getListByFunction(sid, options, fritzapi.FUNCTION_ALARM);
+}
 
 /*
  * WLAN
