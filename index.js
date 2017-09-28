@@ -565,7 +565,7 @@ module.exports.getValveList = function(sid, options)
 // get the thermostats
 module.exports.getThermostatList = function(sid, options)
 {
-    return getValveList(); 
+    return getValveList(sid, options); 
 };
 
 // set target temperature (Solltemperatur)
