@@ -421,7 +421,7 @@ module.exports.getListByFunction = function(sid, options, fritzBit)
 	
 	deviceList = options && options.deviceList
 		? Promise.resolve(options.deviceList) // get from cached
-		: getDeviceList(sid, options); // retrieve via all devices
+		: module.exports.getDeviceList(sid, options); // retrieve via all devices
 	
 	return deviceList.then(function(allDevices) {
 		var devices = allDevices.filter(function(device) {
