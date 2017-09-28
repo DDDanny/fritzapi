@@ -334,11 +334,7 @@ module.exports.getSessionID = function(username, password, options)
         var url = "/login_sid.lua?username=" + username + "&response=" + challengeResponse;
 
         return executeCommand(null, null, null, options, url).then(function(body) {
-            var sessionID = body.match("<SID>(.*?)</SID>")[1];
-            if (sessionID === "0000000000000000") {
-                return Promise.reject(sessionID);
-            }
-            return sessionID;
+			return verifySession(body);
         });
     });
 };
@@ -347,15 +343,18 @@ module.exports.getSessionID = function(username, password, options)
 module.exports.checkSession = function(sid, options)
 {
     return executeCommand(sid, null, null, options, '/login_sid.lua').then(function(body) {
-        var sessionID = body.match("<SID>(.*?)</SID>")[1];
-        if (sessionID === "0000000000000000") {
-            return Promise.reject(sessionID);
-        }
-        return sessionID;
+		return verifySession(body);
     });
 };
 
-
+//internal check session via body
+verifySession(body) {
+	var sessionID = body.match("<SID>(.*?)</SID>")[1];
+	if (sessionID === "0000000000000000") {
+		return Promise.reject(sessionID);
+	}
+	return sessionID;
+}
 /*
  * General functions
  */
@@ -405,7 +404,7 @@ module.exports.getListByFunction = function(sid, options, bit)
 {
 	/* jshint laxbreak:true */
 	
-	var bitSupported = Fritz.FUNCTION_ALARM //could be move to export
+	var bitSupported = Fritz.FUNCTION_ALARM //could be moved to export
 		& Fritz.FUNCTION_THERMOSTAT
 		& Fritz.FUNCTION_ENERGYMETER
 		& Fritz.FUNCTION_TEMPERATURESENSOR
@@ -415,7 +414,7 @@ module.exports.getListByFunction = function(sid, options, bit)
 	if (!bitSupported & bit) return Promise.reject(new Error('Unknown Function Bit' + bit) + '!');
 
 	if (!(options && options.deviceList) && bit == Fritz.FUNCTION_OUTLET) {
-		// no devicelist given,  get switches direct
+		// no devicelist given, switch requested -> get switches direct
 		return module.exports.getOutletList(sid, options);
 	}
 	
@@ -425,10 +424,10 @@ module.exports.getListByFunction = function(sid, options, bit)
 	
 	return deviceList.then(function(allDevices) {
 		var devices = allDevices.filter(function(device) {
-			return device.functionbitmask & bit;
+			console.log(device.identifier, device.functionbitmask, device.functionbitmask & bit);
+			return device.functionbitmask & bit; //device match?
 		}).map(function(device) {
-			// fix ain, no gaps
-			return device.identifier.replace(/\s/g, '');
+			return device.identifier.replace(/\s/g, ''); // fix ain, no gaps
 		});
 
 		return devices;
