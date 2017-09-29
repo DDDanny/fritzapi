@@ -427,7 +427,6 @@ module.exports.getListByFunction = function(sid, options, bit)
 
     return deviceList.then(function(allDevices) {
         var devices = allDevices.filter(function(device) {
-            console.log(device.identifier, device.functionbitmask, device.functionbitmask & bit);
             return device.functionbitmask & bit; //device match?
         }).map(function(device) {
             return device.identifier.replace(/\s/g, ''); // fix ain, no gaps
