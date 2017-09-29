@@ -419,10 +419,18 @@ module.exports.getListByFunction = function(sid, options, bit)
         // switch requested, but no devicelist -> get switches direct
         return module.exports.getOutletList(sid, options);
     }
+
+    if (options && options.deviceList) {
+        deviceList = Promise.resolve(options.deviceList);
+        console.log("using existing", deviceList);
+    } else {
+        deviceList = module.exports.getDeviceList(sid, options);
+        console.log("using via request", deviceList);
+    }
     
-    deviceList = options && options.deviceList
+    /*deviceList = options && options.deviceList
         ? Promise.resolve(options.deviceList) // get from cached
-        : module.exports.getDeviceList(sid, options); // retrieve via all devices
+        : module.exports.getDeviceList(sid, options); // retrieve via all devices*/
     
     return deviceList.then(function(allDevices) {
         var devices = allDevices.filter(function(device) {
