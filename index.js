@@ -405,6 +405,7 @@ module.exports.getDeviceList = function(sid, options)
 module.exports.getListByFunction = function(sid, options, bit)
 {
     /* jshint laxbreak:true */
+    console.log("called", sid, options, bit);
     
     var bitSupported = Fritz.FUNCTION_ALARM //could be moved to export
         | Fritz.FUNCTION_THERMOSTAT
