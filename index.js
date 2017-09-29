@@ -433,7 +433,7 @@ module.exports.getListByFunction = function(sid, options, bit)
             return device.identifier.replace(/\s/g, ''); // fix ain, no gaps
         });
 
-        Promise.resolve(return devices);
+        return Promise.resolve(devices);
     });
 };
 
