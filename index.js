@@ -415,8 +415,8 @@ module.exports.getListByFunction = function(sid, options, bit)
 
     if (!bitSupported & bit) return Promise.reject(new Error('Unknown Function Bit' + bit) + '!');
 
-    if (!(options && options.deviceList) && bit == Fritz.FUNCTION_OUTLET) {
-        // no devicelist given, switch requested -> get switches direct
+    if (bit == Fritz.FUNCTION_OUTLET && options && !options.deviceList) {
+        // switch requested, but no devicelist -> get switches direct
         return module.exports.getOutletList(sid, options);
     }
     
