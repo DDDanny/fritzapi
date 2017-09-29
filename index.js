@@ -1,17 +1,17 @@
 /**
- * smartFritz - Fritz goes smartHome
- *
- * AVM SmartHome nodeJS Control - for AVM Fritz!Box and Dect200 Devices
- *
- * @author Andreas Goetz <cpuidle@gmx.de>
- *
- * Forked from: https://github.com/nischelwitzer/smartfritz
- * nischi - first version: July 2014
- *
- * based on: Node2Fritz by steffen.timm on 05.12.13 for Fritz!OS > 05.50
- * and  thk4711 (code https://github.com/pimatic/pimatic/issues/38)
- * Documentation is at http://www.avm.de/de/Extern/files/session_id/AHA-HTTP-Interface.pdf
- */
+* smartFritz - Fritz goes smartHome
+*
+* AVM SmartHome nodeJS Control - for AVM Fritz!Box and Dect200 Devices
+*
+* @author Andreas Goetz <cpuidle@gmx.de>
+*
+* Forked from: https://github.com/nischelwitzer/smartfritz
+* nischi - first version: July 2014
+*
+* based on: Node2Fritz by steffen.timm on 05.12.13 for Fritz!OS > 05.50
+* and  thk4711 (code https://github.com/pimatic/pimatic/issues/38)
+* Documentation is at http://www.avm.de/de/Extern/files/session_id/AHA-HTTP-Interface.pdf
+*/
 
 /* jshint esversion: 6, -W079 */
 var Promise = require('bluebird');
@@ -22,8 +22,8 @@ var extend = require('extend');
 
 
 /*
- * Object-oriented API
- */
+* Object-oriented API
+*/
 
 module.exports.Fritz = Fritz;
 
@@ -176,21 +176,21 @@ Fritz.prototype = {
 
 
 /*
- * Functional API
- */
+* Functional API
+*/
 
 var defaults = { url: 'http://fritz.box' };
 
 /**
- * Check if numeric value
- */
+* Check if numeric value
+*/
 function isNumeric(n) {
     return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
 /**
- * Execute HTTP request that honors failed/invalid login
- */
+* Execute HTTP request that honors failed/invalid login
+*/
 function httpRequest(path, req, options)
 {
     return new Promise(function(resolve, reject) {
@@ -217,8 +217,8 @@ function httpRequest(path, req, options)
 }
 
 /**
- * Execute Fritz API command for device specified by AIN
- */
+* Execute Fritz API command for device specified by AIN
+*/
 function executeCommand(sid, command, ain, options, path)
 {
     path = path || '/webservices/homeautoswitch.lua?0=0';
@@ -234,8 +234,8 @@ function executeCommand(sid, command, ain, options, path)
 }
 
 /**
- * Parse guest WLAN form settings
- */
+* Parse guest WLAN form settings
+*/
 function parseHTML(html)
 {
     $ = cheerio.load(html);
@@ -267,8 +267,8 @@ function parseHTML(html)
 }
 
 /*
- * Temperature conversion
- */
+* Temperature conversion
+*/
 const MIN_TEMP = 8;
 const MAX_TEMP = 28;
 
@@ -318,8 +318,8 @@ module.exports.FUNCTION_OUTLET              = 1 << 9;  // Schaltsteckdose
 module.exports.FUNCTION_DECTREPEATER        = 1 << 10; // AVM DECT Repeater
 
 /*
- * Session handling
- */
+* Session handling
+*/
 
 // get session id
 module.exports.getSessionID = function(username, password, options)
@@ -334,7 +334,7 @@ module.exports.getSessionID = function(username, password, options)
         var url = "/login_sid.lua?username=" + username + "&response=" + challengeResponse;
 
         return executeCommand(null, null, null, options, url).then(function(body) {
-			return verifySession(body);
+            return verifySession(body);
         });
     });
 };
@@ -343,23 +343,23 @@ module.exports.getSessionID = function(username, password, options)
 module.exports.checkSession = function(sid, options)
 {
     return executeCommand(sid, null, null, options, '/login_sid.lua').then(function(body) {
-		return verifySession(body);
+        return verifySession(body);
     });
 };
 
 //internal check session via body
 function verifySession(body)
 {
-	var sessionID = body.match("<SID>(.*?)</SID>")[1];
-	if (sessionID === "0000000000000000") {
-		return Promise.reject(sessionID);
-	}
-	return sessionID;
+    var sessionID = body.match("<SID>(.*?)</SID>")[1];
+    if (sessionID === "0000000000000000") {
+        return Promise.reject(sessionID);
+    }
+    return sessionID;
 }
 
 /*
- * General functions
- */
+* General functions
+*/
 
 // get OS version
 module.exports.getOSVersion = function(sid, options)
@@ -404,36 +404,36 @@ module.exports.getDeviceList = function(sid, options)
 // for bit choose from FUNCTION_
 module.exports.getListByFunction = function(sid, options, bit)
 {
-	/* jshint laxbreak:true */
-	
-	var bitSupported = Fritz.FUNCTION_ALARM //could be moved to export
-		& Fritz.FUNCTION_THERMOSTAT
-		& Fritz.FUNCTION_ENERGYMETER
-		& Fritz.FUNCTION_TEMPERATURESENSOR
-		& Fritz.FUNCTION_OUTLET
-		& Fritz.FUNCTION_DECTREPEATER;
+    /* jshint laxbreak:true */
+    
+    var bitSupported = Fritz.FUNCTION_ALARM //could be moved to export
+        | Fritz.FUNCTION_THERMOSTAT
+        | Fritz.FUNCTION_ENERGYMETER
+        | Fritz.FUNCTION_TEMPERATURESENSOR
+        | Fritz.FUNCTION_OUTLET
+        | Fritz.FUNCTION_DECTREPEATER;
 
-	if (!bitSupported & bit) return Promise.reject(new Error('Unknown Function Bit' + bit) + '!');
+    if (!bitSupported & bit) return Promise.reject(new Error('Unknown Function Bit' + bit) + '!');
 
-	if (!(options && options.deviceList) && bit == Fritz.FUNCTION_OUTLET) {
-		// no devicelist given, switch requested -> get switches direct
-		return module.exports.getOutletList(sid, options);
-	}
-	
-	deviceList = options && options.deviceList
-		? Promise.resolve(options.deviceList) // get from cached
-		: module.exports.getDeviceList(sid, options); // retrieve via all devices
-	
-	return deviceList.then(function(allDevices) {
-		var devices = allDevices.filter(function(device) {
-			console.log(device.identifier, device.functionbitmask, device.functionbitmask & bit);
-			return device.functionbitmask & bit; //device match?
-		}).map(function(device) {
-			return device.identifier.replace(/\s/g, ''); // fix ain, no gaps
-		});
+    if (!(options && options.deviceList) && bit == Fritz.FUNCTION_OUTLET) {
+        // no devicelist given, switch requested -> get switches direct
+        return module.exports.getOutletList(sid, options);
+    }
+    
+    deviceList = options && options.deviceList
+        ? Promise.resolve(options.deviceList) // get from cached
+        : module.exports.getDeviceList(sid, options); // retrieve via all devices
+    
+    return deviceList.then(function(allDevices) {
+        var devices = allDevices.filter(function(device) {
+            console.log(device.identifier, device.functionbitmask, device.functionbitmask & bit);
+            return device.functionbitmask & bit; //device match?
+        }).map(function(device) {
+            return device.identifier.replace(/\s/g, ''); // fix ain, no gaps
+        });
 
-		return devices;
-	});
+        return devices;
+    });
 };
 
 // get single device
@@ -456,7 +456,7 @@ module.exports.getDevice = function(sid, ain, options)
 // get AINs of all temperature supported devices from fritzbox or from given options.devicelist */
 module.exports.getTemperatureSensorsList = function(sid, options)
 {
-	return module.exports.getListByFunction(sid, options, Fritz.FUNCTION_TEMPERATURESENSOR);
+    return module.exports.getListByFunction(sid, options, Fritz.FUNCTION_TEMPERATURESENSOR);
 };
 
 // get temperature- both switches and thermostats are supported, but not powerline modules
@@ -477,13 +477,13 @@ module.exports.getPresence = function(sid, ain, options)
 
 
 /*
- * Switches
- */
+* Switches
+*/
 
 // get AINs of all switch supported devices from fritzbox or from given options.devicelist
 module.exports.getSwitchList = function(sid, options)
 {
-	return module.exports.getListByFunction(sid, options, Fritz.FUNCTION_OUTLET);
+    return module.exports.getListByFunction(sid, options, Fritz.FUNCTION_OUTLET);
 };
 
 // get switch list without caching
@@ -554,13 +554,13 @@ module.exports.getSwitchName = function(sid, ain, options)
 
 
 /*
- * Thermostats
- */
+* Thermostats
+*/
 
 // get AINs of all dect heater controls from fritzbox or from given options.devicelist
 module.exports.getValveList = function(sid, options)
 {
-	return module.exports.getListByFunction(sid, options, Fritz.FUNCTION_THERMOSTAT);
+    return module.exports.getListByFunction(sid, options, Fritz.FUNCTION_THERMOSTAT);
 };
 
 
@@ -629,38 +629,38 @@ module.exports.getBatteryCharge = function(sid, ain, options)
 };
 
 /*
- * Dect Repeaters
- */
+* Dect Repeaters
+*/
 
 // get AINs of all dect repeaters from fritzbox or from given options.devicelist
 module.exports.getDectRepeaterList = function(sid, options)
 {
-	return module.exports.getListByFunction(sid, options, Fritz.FUNCTION_DECTREPEATER);
+    return module.exports.getListByFunction(sid, options, Fritz.FUNCTION_DECTREPEATER);
 };
 
 /*
- * Energy
- */
+* Energy
+*/
 
 // get AINs of all all energy meters from fritzbox or from given options.devicelist */
 module.exports.getEnergyMeterList = function(sid, options)
 {
-	return module.exports.getListByFunction(sid, options, Fritz.FUNCTION_ENERGYMETER);
+    return module.exports.getListByFunction(sid, options, Fritz.FUNCTION_ENERGYMETER);
 };
 
 /*
- * Alarms
- */
+* Alarms
+*/
 
 // get AINs of all all alarm supported devices from fritzbox or from given options.devicelist
 module.exports.getAlarmList = function(sid, options)
 {
-	return module.exports.getListByFunction(sid, options, Fritz.FUNCTION_ALARM);
+    return module.exports.getListByFunction(sid, options, Fritz.FUNCTION_ALARM);
 };
 
 /*
- * WLAN
- */
+* WLAN
+*/
 
 // get guest WLAN settings - not part of Fritz API
 module.exports.getGuestWlan = function(sid, options)
