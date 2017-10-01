@@ -1,6 +1,8 @@
 # fritzapi
 [![Build status](https://travis-ci.org/DDDanny/fritzapi.svg?branch=caching)](https://travis-ci.org/DDDanny/fritzapi.svg?branch=caching)
 
+[![Dependency Status](https://www.versioneye.com/user/projects/59d12d332de28c1372304429/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/59d12d332de28c1372304429)
+
 Home automation node API for Fritz!Box, Fritz!DECT and FRITZ!Powerline devices. 
 
 [homebridge-fritz](https://github.com/andig/homebridge-fritz) and [pimatic-fritz](https://github.com/andig/pimatic-fritz) are built on fritzapi.

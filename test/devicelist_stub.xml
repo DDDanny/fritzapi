@@ -1,0 +1,142 @@
+<!-- taken from https://avm.de/fileadmin/user_upload/Global/Service/Schnittstellen/AHA-HTTP-Interface.pdf -->
+<devicelist version="1">
+    <device identifier="08761 1048079" id="16" functionbitmask="1280" fwversion="03.33" manufacturer="AVM" productname="FRITZ!DECT Repeater 100">
+        <present>1</present>
+        <name>FRITZ!DECT Rep 100 #1</name>
+        <temperature>
+            <celsius>288</celsius>
+            <offset>0</offset>
+        </temperature>
+    </device>
+
+    <!-- orignal example -->
+    <device identifier="08761 0000434" id="17" functionbitmask="896" fwversion="03.33" manufacturer="AVM" productname="FRITZ!DECT 200">
+        <present>1</present>
+        <name>Steckdose</name>
+        <switch>
+            <state>1</state>
+            <mode>auto</mode>
+            <lock>0</lock>
+            <devicelock>0</devicelock>
+        </switch>
+        <powermeter>
+            <power>1234</power>
+            <energy>707</energy>
+        </powermeter>
+        <temperature>
+            <celsius>285</celsius>
+            <offset>0</offset>
+        </temperature>
+    </device>
+
+    <!-- custom example ident+1 present=0 state=0 mode=manuell fw=471.11 manufact=test prodname=FRITZ!DECT 210 lock and devicelock=1 pwer 1234567 (1234.567 watt)  666wh 16C (including 0.5 offset)-->
+    <device identifier="08761 0000435" id="18" functionbitmask="896" fwversion="47.11" manufacturer="test" productname="FRITZ!DECT 210">
+        <present>0</present>
+        <name>Steckdose manuell offline</name>
+        <switch>
+            <state>0</state>s
+            <mode>manuell</mode>
+            <lock>1</lock>
+            <devicelock>1</devicelock>
+        </switch>
+        <powermeter>
+            <power>12345678</power>
+            <energy>666</energy>
+        </powermeter>
+        <temperature>
+            <celsius>160</celsius>
+            <offset>0.5</offset>
+        </temperature>
+    </device>
+
+    <!-- 4 dummy aler devices -->
+    <device identifier="0000 0000001" id="19" functionbitmask="0" fwversion="03.33" manufacturer="???" productname="dummy alert">
+        <present>0</present>
+        <name>Alert test Device #1<name>
+        <alert>
+            <state>0</state>
+        </alert>
+    </device>
+    <device identifier="0000 0000002" id="20" functionbitmask="0" fwversion="03.33" manufacturer="???" productname="dummy alert">
+        <present>0</present>
+        <name>Alert test Device #2<name>
+        <alert>
+            <state>0</state>
+        </alert>
+    </device>
+    <device identifier="0000 0000003" id="21" functionbitmask="0" fwversion="03.33" manufacturer="???" productname="dummy alert">
+        <present>0</present>
+        <name>Alert test Device #3<name>
+        <alert>
+            <state>1</state>
+        </alert>
+    </device>
+    <device identifier="0000 0000004" id="22" functionbitmask="0" fwversion="03.33" manufacturer="???" productname="dummy alert">
+        <present>0</present>
+        <name>Alert test Device #4</name>
+        <alert>
+            <state>1</state>
+        </alert>
+    </device>
+
+    <!-- 2 custom heater elements -->
+    <device identifier="00000 0063088" id="25" functionbitmask="320" fwversion="03.54" manufacturer="AVM" productname="Comet DECT">
+        <present>1</present>
+        <name>HK XXX</name>
+        <temperature>
+            <celsius>205</celsius>
+            <offset>0</offset>
+        </temperature>
+        <hkr>
+            <tist>41</tist>
+            <tsoll>253</tsoll>
+            <absenk>16</absenk>
+            <komfort>40</komfort>
+            <lock>0</lock>
+            <devicelock>0</devicelock>
+            <errorcode>0</errorcode>
+            <batterylow>1</batterylow>
+            <nextchange>
+                <endperiod>0</endperiod>
+                <tchange>40</tchange>
+            </nextchange>
+        </hkr>
+    </device>
+
+    <device identifier="00000 0040184" id="26" functionbitmask="320" fwversion="03.54" manufacturer="AVM" productname="Comet DECT">
+        <present>0</present>
+        <name>HK YYY</name>
+        <temperature>
+            <celsius>200</celsius>
+            <offset>0</offset>
+        </temperature>
+        <hkr>
+            <tist>40</tist>
+            <tsoll>254</tsoll>
+            <absenk>28</absenk>
+            <komfort>40</komfort>
+            <lock>0</lock>
+            <devicelock>0</devicelock>
+            <errorcode>0</errorcode>
+            <batterylow>0</batterylow>
+            <nextchange>
+                <endperiod>0</endperiod>
+                <tchange>40</tchange>
+            </nextchange>
+        </hkr>
+    </device>
+    
+    <group identifier="65:3A:18-900" id="900" functionbitmask="512" fwversion="1.0" manufacturer="AVM" productname="">
+        <present>1</present>
+        <name>Gruppe</name>
+        <switch>
+            <state>1</state>
+            <mode>auto</mode>
+            <lock/><devicelock/>
+        </switch>
+        <groupinfo>
+            <masterdeviceid>0</masterdeviceid>
+            <members>17</members>
+        </groupinfo>
+    </group>
+</devicelist>
