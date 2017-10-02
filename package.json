@@ -46,7 +46,7 @@
   },
   "dependencies": {
     "bluebird": "3.0.x",
-    "cheerio": "1.0.x",
+    "cheerio": "0.22.x",
     "command-line-args": "4.0.x",
     "command-line-usage": "4.0.x",
     "extend": "3.0.x",
