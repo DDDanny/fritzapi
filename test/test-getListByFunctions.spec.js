@@ -1,5 +1,7 @@
+/*
 //testing of getListByFunctions 
 const chai = require('chai');
+var fritzapi = require('../fritzapi');
 
 describe('getListByFunction', function () {
     it('undefined bit => empty list', function * () {
@@ -12,3 +14,4 @@ describe('getListByFunction', function () {
         });
     })
 })
+*/

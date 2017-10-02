@@ -45,19 +45,19 @@
     "coverage": "istanbul cover _mocha -- -R spec"
   },
   "dependencies": {
-    "bluebird": ">=3.0.*",
-    "cheerio": ">=1.0.*",
-    "command-line-args": ">=4.0.*",
-    "command-line-usage": ">=4.0.*",
-    "extend": ">=3.0.*",
-    "request": ">=2.45.*",
-    "xml2json-light": ">=1.0.*"
+    "bluebird": "3.0.x",
+    "cheerio": "1.0.x",
+    "command-line-args": "4.0.x",
+    "command-line-usage": "4.0.x",
+    "extend": "3.0.x",
+    "request": "2.45.x",
+    "xml2json-light": "1.0.x"
   },
   "devDependencies": {
-    "chai": ">=4.1.*",
-    "istanbul": ">=0.4.*",
-    "jshint": ">=2.9.*",
-    "mocha": ">=3.5.*",
-    "sinon": ">=4.0.*"
+    "chai": "4.1.x",
+    "istanbul": "0.4.x",
+    "jshint": "2.9.x",
+    "mocha": "3.5.x",
+    "sinon": "4.0.x"
   }
 }
