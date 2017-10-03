@@ -42,7 +42,7 @@
   "scripts": {
     "pretest": "node_modules/jshint/bin/jshint index.js",
     "test": "NODE_ENV=test mocha './test/**/*.spec.js'",
-    "coverage": "istanbul cover _mocha -- -R spec"
+    "coverage": "istanbul cover _mocha -- ./test/**/*.spec.js"
   },
   "dependencies": {
     "bluebird": "3.0.x",
@@ -58,6 +58,7 @@
     "istanbul": "0.4.x",
     "jshint": "2.9.x",
     "mocha": "3.5.x",
-    "sinon": "4.0.x"
+    "sinon": "4.0.x",
+    "sinon-chai": "2.14.x"
   }
 }

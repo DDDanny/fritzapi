@@ -52,21 +52,21 @@
     <!-- 4 dummy aler devices -->
     <device identifier="0000 0000001" id="19" functionbitmask="0" fwversion="03.33" manufacturer="???" productname="dummy alert">
         <present>0</present>
-        <name>Alert test Device #1<name>
+        <name>Alert test Device #1</name>
         <alert>
             <state>0</state>
         </alert>
     </device>
     <device identifier="0000 0000002" id="20" functionbitmask="0" fwversion="03.33" manufacturer="???" productname="dummy alert">
         <present>0</present>
-        <name>Alert test Device #2<name>
+        <name>Alert test Device #2</name>
         <alert>
             <state>0</state>
         </alert>
     </device>
     <device identifier="0000 0000003" id="21" functionbitmask="0" fwversion="03.33" manufacturer="???" productname="dummy alert">
         <present>0</present>
-        <name>Alert test Device #3<name>
+        <name>Alert test Device #3</name>
         <alert>
             <state>1</state>
         </alert>

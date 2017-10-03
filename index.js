@@ -32,15 +32,15 @@ function Fritz(username, password, uri) {
     this.username = username;
     this.password = password;
     this.options = { url: uri || 'http://fritz.box' };
-}
 
-// functionbitmask
-Fritz.ALARM = module.exports.FUNCTION_ALARM;
-Fritz.THERMOSTAT = module.exports.FUNCTION_THERMOSTAT;
-Fritz.ENERGYMETER = module.exports.FUNCTION_ENERGYMETER;
-Fritz.TEMPERATURESENSOR = module.exports.FUNCTION_TEMPERATURESENSOR;
-Fritz.OUTLET = module.exports.FUNCTION_OUTLET;
-Fritz.DECTREPEATER = module.exports.FUNCTION_DECTREPEATER;
+    //bitfunctions hidden, unchangable to prototype
+    Object.defineProperty( Fritz.prototype, "ALARM",             {value: module.exports.FUNCTION_ALARM,             writable: false});
+    Object.defineProperty( Fritz.prototype, "THERMOSTAT",        {value: module.exports.FUNCTION_THERMOSTAT,        writable: false});
+    Object.defineProperty( Fritz.prototype, "ENERGYMETER",       {value: module.exports.FUNCTION_ENERGYMETER,       writable: false});
+    Object.defineProperty( Fritz.prototype, "TEMPERATURESENSOR", {value: module.exports.FUNCTION_TEMPERATURESENSOR, writable: false});
+    Object.defineProperty( Fritz.prototype, "OUTLET",            {value: module.exports.FUNCTION_OUTLET,            writable: false});
+    Object.defineProperty( Fritz.prototype, "DECTREPEATER",      {value: module.exports.FUNCTION_DECTREPEATER,      writable: false});
+}
 
 Fritz.prototype = {
     call: function(func) {
@@ -99,6 +99,10 @@ Fritz.prototype = {
 
     getDevice: function(ain) {
         return this.call(module.exports.getDevice, ain);
+    },
+
+    getDeviceName: function(ain) {
+        return this.call(module.exports.getDeviceName, ain);
     },
 
     getTemperature: function(ain) {
@@ -173,7 +177,6 @@ Fritz.prototype = {
         return this.call(module.exports.setGuestWlan, enable);
     },
 };
-
 
 /*
 * Functional API
@@ -452,6 +455,24 @@ module.exports.getDevice = function(sid, ain, options)
         return device || Promise.reject();
     });
 };
+
+// get name of any device
+module.exports.getDeviceName = function(sid, ain, options)
+{
+    /* jshint laxbreak:true */
+    var deviceList = options && options.deviceList
+        ? Promise.resolve(options.deviceList)
+        : module.exports.getDeviceList(sid, options);
+
+    return deviceList.then(function(devices) {
+        var device = devices.find(function(device) {
+            return device.identifier.replace(/\s/g, '') == ain;
+        });
+
+        return device || Promise.reject();
+    });
+};
+
 
 // get AINs of all temperature supported devices from fritzbox or from given options.devicelist */
 module.exports.getTemperatureSensorsList = function(sid, options)
