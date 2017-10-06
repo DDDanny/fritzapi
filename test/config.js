@@ -1,3 +1,8 @@
+"use strict";
+/* jshint esversion: 6 */
+/* jslint node: true */
+/*global describe, it, before, beforeEach, after, afterEach */
+
 /*  This test defines the expected test results for the three supported test types
  *  - dev (default): test runs by usage of devicelist_static.xml
  *  - custom: test runs by usage of devicelist_custom.xml
@@ -11,7 +16,7 @@ const LIVE   = 'live';
 
 var MODE = DEV; //2do set cmd args
 
-var TESTMATRIX;
+var TEST_MATRIX;
 
 module.exports.cfgTestMatrix = () => {
     /* cfg: CUSTOM
@@ -33,8 +38,8 @@ module.exports.cfgTestMatrix = () => {
      * please do not change
      **************/
     TEST_MATRIX[DEV].devicelist.version = 'develop';
-    TEST_MATRIX[DEV].xmlFile = './test/devicelist_static.xml';
-}
+    TEST_MATRIX[DEV].xmlFile = './test/devicelist_dev.xml';
+};
 
 initTestMatrix();
 module.exports.cfgTestMatrix();
@@ -73,28 +78,28 @@ var devicelistSinon = {};
 //get devicelistSinon
 module.exports.getDevicelistInfoSinon = () => {
     return devicelistSinon;
-}
+};
 
 module.exports.isDevTest = () => {
     return MODE === DEV;
-}
+};
 
 module.exports.isCustomTest = () => {
     return MODE === CUSTOM;
-}
+};
 
 module.exports.isLiveTest = () => {
     return MODE === LIVE;
-}
+};
 
 module.exports.getTestmode = () => {
     return MODE;
-}
+};
 
 //pass the path to read as array
 module.exports.readValue = (pathArr) => {
     return readValueByPath(TEST_MATRIX[MODE], pathArr);
-}
+};
 /*
  * internals
  *************/

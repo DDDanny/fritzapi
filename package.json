@@ -40,6 +40,7 @@
   },
   "main": "index.js",
   "scripts": {
+    "verifytests": "node_modules/jshint/bin/jshint ./test/*.js",
     "pretest": "node_modules/jshint/bin/jshint index.js",
     "test": "NODE_ENV=test mocha './test/**/*.spec.js'",
     "coverage": "istanbul cover _mocha"
@@ -56,6 +57,7 @@
   "devDependencies": {
     "chai": "4.1.x",
     "chai-as-promised": "7.1.x",
+    "chai-string": "^1.4.0",
     "istanbul": "0.4.x",
     "jshint": "2.9.x",
     "mocha": "3.5.x",

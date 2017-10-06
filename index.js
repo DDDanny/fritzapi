@@ -1,3 +1,7 @@
+"use strict";
+/* jshint esversion: 6, -W079 */
+/* jslint node: true */
+
 /**
  * smartFritz - Fritz goes smartHome
  *
@@ -13,7 +17,6 @@
  * Documentation is at http://www.avm.de/de/Extern/files/session_id/AHA-HTTP-Interface.pdf
  */
 
-/* jshint esversion: 6, -W079 */
 var Promise = require('bluebird');
 var request = require('request');
 var cheerio = require('cheerio');
@@ -34,12 +37,14 @@ function Fritz(username, password, uri) {
     this.options = { url: uri || 'http://fritz.box' };
 
     //bitfunctions hidden, unchangable to prototype
-    if (!Fritz.prototype.ALARM)             { Object.defineProperty( Fritz.prototype, "ALARM",             {value: module.exports.FUNCTION_ALARM,             writable: false}); }
-    if (!Fritz.prototype.THERMOSTAT)        { Object.defineProperty( Fritz.prototype, "THERMOSTAT",        {value: module.exports.FUNCTION_THERMOSTAT,        writable: false}); }
-    if (!Fritz.prototype.ENERGYMETER)       { Object.defineProperty( Fritz.prototype, "ENERGYMETER",       {value: module.exports.FUNCTION_ENERGYMETER,       writable: false}); }
-    if (!Fritz.prototype.TEMPERATURESENSOR) { Object.defineProperty( Fritz.prototype, "TEMPERATURESENSOR", {value: module.exports.FUNCTION_TEMPERATURESENSOR, writable: false}); }
-    if (!Fritz.prototype.OUTLET)            { Object.defineProperty( Fritz.prototype, "OUTLET",            {value: module.exports.FUNCTION_OUTLET,            writable: false}); }
-    if (!Fritz.prototype.DECTREPEATER)      { Object.defineProperty( Fritz.prototype, "DECTREPEATER",      {value: module.exports.FUNCTION_DECTREPEATER,      writable: false}); }
+    if (!Fritz.prototype.ALARM)             { Object.defineProperty( Fritz.prototype, "ALARM",             {value: FUNCTION_ALARM,             writable: false, enumerable: true }); }
+    if (!Fritz.prototype.THERMOSTAT)        { Object.defineProperty( Fritz.prototype, "THERMOSTAT",        {value: FUNCTION_THERMOSTAT,        writable: false, enumerable: true }); }
+    if (!Fritz.prototype.ENERGYMETER)       { Object.defineProperty( Fritz.prototype, "ENERGYMETER",       {value: FUNCTION_ENERGYMETER,       writable: false, enumerable: true }); }
+    if (!Fritz.prototype.TEMPERATURESENSOR) { Object.defineProperty( Fritz.prototype, "TEMPERATURESENSOR", {value: FUNCTION_TEMPERATURESENSOR, writable: false, enumerable: true }); }
+    if (!Fritz.prototype.OUTLET)            { Object.defineProperty( Fritz.prototype, "OUTLET",            {value: FUNCTION_OUTLET,            writable: false, enumerable: true }); }
+    if (!Fritz.prototype.DECTREPEATER)      { Object.defineProperty( Fritz.prototype, "DECTREPEATER",      {value: FUNCTION_DECTREPEATER,      writable: false, enumerable: true }); }
+
+    if (!Fritz.prototype.INVALID_SID)       { Object.defineProperty( Fritz.prototype, "INVALID_SID",       {value: INVALID_SID,                writable: false, enumerable: true }); }    
 }
 
 Fritz.prototype = {
@@ -187,6 +192,8 @@ Fritz.prototype = {
  * Functional API
  */
 
+const INVALID_SID = '0000000000000000';
+ 
 var bufferedDevicelistInfoVersion;
 var defaults = { url: 'http://fritz.box' };
 
@@ -247,7 +254,7 @@ function executeCommand(sid, command, ain, options, path)
  */
 function parseHTML(html)
 {
-    $ = cheerio.load(html);
+    var $ = cheerio.load(html);
     var form = $('form');
     var settings = {};
 
@@ -309,6 +316,14 @@ function api2temp(param)
     }
 }
 
+// functions bitmask
+const FUNCTION_ALARM               = 1 << 4;  // Alarm Sensor
+const FUNCTION_THERMOSTAT          = 1 << 6;  // Comet DECT, Heizkostenregler
+const FUNCTION_ENERGYMETER         = 1 << 7;  // Energie Messgerät
+const FUNCTION_TEMPERATURESENSOR   = 1 << 8;  // Temperatursensor
+const FUNCTION_OUTLET              = 1 << 9;  // Schaltsteckdose
+const FUNCTION_DECTREPEATER        = 1 << 10; // AVM DECT Repeater
+
 // #############################################################################
 
 // run command for selected device
@@ -319,12 +334,15 @@ module.exports.MIN_TEMP = MIN_TEMP;
 module.exports.MAX_TEMP = MAX_TEMP;
 
 // functions bitmask
-module.exports.FUNCTION_ALARM               = 1 << 4;  // Alarm Sensor
-module.exports.FUNCTION_THERMOSTAT          = 1 << 6;  // Comet DECT, Heizkostenregler
-module.exports.FUNCTION_ENERGYMETER         = 1 << 7;  // Energie Messgerät
-module.exports.FUNCTION_TEMPERATURESENSOR   = 1 << 8;  // Temperatursensor
-module.exports.FUNCTION_OUTLET              = 1 << 9;  // Schaltsteckdose
-module.exports.FUNCTION_DECTREPEATER        = 1 << 10; // AVM DECT Repeater
+module.exports.FUNCTION_ALARM               = FUNCTION_ALARM;
+module.exports.FUNCTION_THERMOSTAT          = FUNCTION_THERMOSTAT;
+module.exports.FUNCTION_ENERGYMETER         = FUNCTION_ENERGYMETER;
+module.exports.FUNCTION_TEMPERATURESENSOR   = FUNCTION_TEMPERATURESENSOR;
+module.exports.FUNCTION_OUTLET              = FUNCTION_OUTLET;
+module.exports.FUNCTION_DECTREPEATER        = FUNCTION_DECTREPEATER;
+
+//invalid session
+module.exports.INVALID_SID = INVALID_SID;
 
 /*
  * Session handling
@@ -360,7 +378,7 @@ module.exports.checkSession = function(sid, options)
 function verifySession(body)
 {
     var sessionID = body.match("<SID>(.*?)</SID>")[1];
-    if (sessionID === "0000000000000000") {
+    if (sessionID === INVALID_SID) {
         return Promise.reject(sessionID);
     }
     return sessionID;
@@ -652,7 +670,7 @@ module.exports.getBatteryCharge = function(sid, ain, options)
         };
 
         return httpRequest('/data.lua', req, options).then(function(body) {
-            $ = cheerio.load(body);
+            var $ = cheerio.load(body);
             // search for Batter(ie|y)
             var battery = $('div>label:contains(Batter)+span').first().text().replace(/[\s%]/g, '');
             return isNumeric(battery) ? parseInt(battery, 10) : null;

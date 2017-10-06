@@ -4,11 +4,12 @@ Static code tests are done via <img src="http://jslint.com/image/jslintpill.gif"
 
 ## basics
 
-All tests are devided into two main approaches.
-* stub-test: The unit tests will run against stubbed XML list to test `get`-functions, so you need no fritz.box and no login data. This is the default setting for running the test via e.g. `npm test` and is involved in *travis before_script*.
-* {2do} live-test: Tests will be carried out with live data from a fritz.box with provided credentials. If you develop always ensure that you `.gitignore` the live-test config!
+Tests can be configured via `config.js` to run as
+* dev: (default) The unit tests will run against fixed XML `devicelist_dev.xml` that provides a reply of devices to test `get`-functions, so you need no fritz.box and no login data. This is the default setting for running the test via e.g. `npm test` and is involved in *travis before_script*.
+* custom: You can procide a XML (default `devicelist_custom.xml`) and specify your expactions in the `config.js`.
+* live: Tests will be carried out with live data from a fritz.box with provided credentials. The same expactions as for custom will be used - this can be configured. If you develop always **ensure that you remove your credentials from the `config.js**
 
-All tests should cover both API functionallity
+All tests cover both API functionallity
 * Functional API
 * {2do} OO based API
 
@@ -30,7 +31,6 @@ Stubbed XML `devicelist_cache_stub.xml` is to test (devicelist/device) caching
 
 - [ ] device: getDevice
 - [ ] devicename: getDeviceName 
-
 
 - [ ] sid: getSID
 
