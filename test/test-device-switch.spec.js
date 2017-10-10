@@ -78,8 +78,8 @@ describe('Device: Switch [' + cfg.getTestmode() + ']', function () {
                 }).then(() => {
                     getDeviceSpy.should.have.callCount(cfg.readValue(['switchActors', 'ains']).length);
                     cfg.getDevicelistInfoSinon().should.have.been.calledOnce;
-                }).then(done, done);;
-            })
+                }).then(done, done);
+            });
         });
     });
         
@@ -120,8 +120,8 @@ describe('Device: Switch [' + cfg.getTestmode() + ']', function () {
                 }).then(() => {
                     getDeviceSpy.should.have.callCount(cfg.readValue(['switchActors', 'ains']).length);
                     cfg.getDevicelistInfoSinon().should.have.been.calledOnce;
-                }).then(done, done);;
-            })
+                }).then(done, done);
+            });
         });
     });
     
@@ -200,8 +200,8 @@ describe('Device: Switch [' + cfg.getTestmode() + ']', function () {
                 }).then(() => {
                     getDeviceSpy.should.have.callCount(cfg.readValue(['switchActors', 'ains']).length);
                     cfg.getDevicelistInfoSinon().should.have.been.calledOnce;
-                }).then(done, done);;
-            })
+                }).then(done, done);
+            });
         });
     });
 
@@ -242,8 +242,8 @@ describe('Device: Switch [' + cfg.getTestmode() + ']', function () {
                 }).then(() => {
                     getDeviceSpy.should.have.callCount(cfg.readValue(['switchActors', 'ains']).length);
                     cfg.getDevicelistInfoSinon().should.have.been.calledOnce;
-                }).then(done, done);;
-            })
+                }).then(done, done);
+            });
         });
     });
     
