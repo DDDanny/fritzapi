@@ -30,11 +30,14 @@ var extend = require('extend');
 
 module.exports.Fritz = Fritz;
 
-function Fritz(username, password, uri) {
+function Fritz(username, password, uri, strictSSL) {
     this.sid = null;
     this.username = username;
     this.password = password;
-    this.options = { url: uri || 'http://fritz.box' };
+    this.options = { 
+        url: uri || 'https://fritz.box', //default https
+        strictSSL: strictSSL || !(strictSSL == undefined && !uri) //on default url, allow self signed certificates
+    };
 
     //bitfunctions hidden, unchangable to prototype
     if (!Fritz.prototype.ALARM)             { Object.defineProperty( Fritz.prototype, "ALARM",             {value: FUNCTION_ALARM,             writable: false, enumerable: true }); }
@@ -58,7 +61,6 @@ Fritz.prototype = {
 
         // function arguments beyond func parameter
         var args = Array.from(arguments).slice(1).concat(this.options);
-
         return promise.then(function(sid) {
             this.sid = sid;
 
@@ -90,10 +92,6 @@ Fritz.prototype = {
         return this.sid;
     },
 
-    getOSVersion: function() {
-        return this.call(module.exports.getOSVersion);
-    },
-
     getDeviceListInfo: function() {
         return this.call(module.exports.getDeviceListInfo);
     },
@@ -110,22 +108,58 @@ Fritz.prototype = {
         return this.call(module.exports.getDevice, ain);
     },
 
-    getDeviceName: function(ain) {
+    getName: function(ain) {
         return this.call(module.exports.getDeviceName, ain);
     },
 
-    getTemperature: function(ain) {
-        return this.call(module.exports.getTemperature, ain);
+    getId: function(ain) {
+        return this.call(module.exports.getDeviceId, ain);
     },
 
     getPresence: function(ain) {
         return this.call(module.exports.getPresence, ain);
     },
 
+    getListByFunction: function() {
+        return this.call(module.exports.getListByFunction);
+    },
+    
+    getTemperature: function(ain) {
+        return this.call(module.exports.getTemperature, ain);
+    },
+
     getSwitchList: function() {
         return this.call(module.exports.getSwitchList);
     },
 
+    getOutletList: function() {
+        return this.call(module.exports.getSwitchList);
+    },
+
+    getThermostatList: function() {
+        return this.call(module.exports.getThermostatList);
+    },
+
+    getValveList: function() {
+        return this.call(module.exports.getValveList);
+    },
+
+    getDectRepeaterList: function() {
+        return this.call(module.exports.getDectRepeaterList);
+    },
+
+    getAlarmList: function() {
+        return this.call(module.exports.getAlarmList);
+    },
+
+    getEnergyMeterList: function() {
+        return this.call(module.exports.getEnergyMeterList);
+    },
+
+    getTemperatureSensorList: function() {
+        return this.call(module.exports.getTemperatureSensorList);
+    },
+    
     getSwitchState: function(ain) {
         return this.call(module.exports.getSwitchState, ain);
     },
@@ -152,10 +186,6 @@ Fritz.prototype = {
 
     getSwitchName: function(ain) {
         return this.call(module.exports.getSwitchName, ain);
-    },
-
-    getThermostatList: function() {
-        return this.call(module.exports.getThermostatList);
     },
 
     setTempTarget: function(ain, temp) {
@@ -185,6 +215,10 @@ Fritz.prototype = {
     setGuestWlan: function(enable) {
         return this.call(module.exports.setGuestWlan, enable);
     },
+
+    getOSVersion: function() {
+        return this.call(module.exports.getOSVersion);
+    },
 };
 
 
@@ -201,7 +235,7 @@ var defaults = { url: 'http://fritz.box' };
  * Check if numeric value
  */
 function isNumeric(n) {
-    return !isNaN(parseFloat(n)) && isFinite(n);
+    return !isNaN(parseFloat(n, 10)) && isFinite(n);
 }
 
 /**
@@ -249,72 +283,46 @@ function executeCommand(sid, command, ain, options, path)
     return httpRequest(path, {}, options);
 }
 
-/**
- * Parse guest WLAN form settings
- */
-function parseHTML(html)
-{
-    var $ = cheerio.load(html);
-    var form = $('form');
-    var settings = {};
-
-    $('input', form).each(function(i, elem) {
-        var val;
-        var name = $(elem).attr('name');
-        if (!name) return;
-
-        switch ($(elem).attr('type')) {
-            case 'checkbox':
-                val = $(elem).attr('checked') == 'checked';
-                break;
-            default:
-                val = $(elem).val();
-        }
-        settings[name] = val;
-    });
-
-    $('select option[selected=selected]', form).each(function(i, elem) {
-        var val = $(elem).val();
-        var name = $(elem).parent().attr('name');
-        settings[name] = val;
-    });
-
-    return settings;
-}
-
 /*
  * Temperature conversion
  */
 const MIN_TEMP = 8;
 const MAX_TEMP = 28;
+const ON_TEMP = 254;
+const OFF_TEMP = 253;
+
+module.exports.MIN_TEMP = MIN_TEMP;
+module.exports.MAX_TEMP = MAX_TEMP;
+module.exports.ON_TEMP = ON_TEMP;
+module.exports.OFF_TEMP = OFF_TEMP;
 
 function temp2api(temp)
 {
     var res;
 
-    if (temp == 'on' || temp === true)
-        res = 254;
-    else if (temp == 'off' || temp === false)
-        res = 253;
-    else {
-        // 0.5C accuracy
-        res = Math.round((Math.min(Math.max(temp, MIN_TEMP), MAX_TEMP) - 8) * 2) + 16;
-    }
+    if (temp == 'on' || temp == 'ON' || temp === true || temp === AVM_TRUE)
+        res = ON_TEMP;
+    else if (temp == 'off' || temp == 'OFF' || temp === false || temp === AVM_FALSE)
+        res = OFF_TEMP;
+    else
+        res = Math.round((Math.min(Math.max(temp, MIN_TEMP), MAX_TEMP) - MIN_TEMP) * 2) + (2 * MIN_TEMP); // 0.5C accuracy
 
     return res;
 }
 
 function api2temp(param)
 {
-    if (param == 254)
-        return 'on';
-    else if (param == 253)
+    if (param == OFF_TEMP || param < MIN_TEMP)
         return 'off';
-    else {
-        // 0.5C accuracy
-        return (parseFloat(param) - 16) / 2 + 8;
-    }
+    if (param != OFF_TEMP && param > MAX_TEMP ) //all values above 28 that are not off temp
+        return 'on';
+    else
+        return (parseFloat(param) - (2 * MIN_TEMP)) / 2 + MIN_TEMP; // 0.5C accuracy
 }
+
+//AVM true/false strings
+const AVM_TRUE = '1';
+const AVM_FALSE = '0';
 
 // functions bitmask
 const FUNCTION_ALARM               = 1 << 4;  // Alarm Sensor
@@ -332,6 +340,10 @@ module.exports.executeCommand = executeCommand;
 // supported temperature range
 module.exports.MIN_TEMP = MIN_TEMP;
 module.exports.MAX_TEMP = MAX_TEMP;
+
+//AVM true/false strings
+module.exports.AVM_TRUE  = AVM_TRUE;
+module.exports.AVM_FALSE = AVM_FALSE;
 
 // functions bitmask
 module.exports.FUNCTION_ALARM               = FUNCTION_ALARM;
@@ -384,10 +396,6 @@ function verifySession(body)
     return sessionID;
 }
 
-/*
- * General functions
- */
-
 //internal helper returns given devicelist or get it from fritz.box
 function forkDevicelist(sid, options)
 {
@@ -397,27 +405,9 @@ function forkDevicelist(sid, options)
         : module.exports.getDeviceList(sid, options); // retrieve via all devices*/    
 }
 
-// get OS version
-module.exports.getOSVersion = function(sid, options)
-{
-    var req = {
-        method: 'POST',
-        form: {
-            sid: sid,
-            xhr: 1,
-            page: 'overview'
-        }
-    };
-
-    /* jshint laxbreak:true */
-    return httpRequest('/data.lua', req, options).then(function(body) {
-        var json = JSON.parse(body);
-        var osVersion = json.data && json.data.fritzos && json.data.fritzos.nspver
-            ? json.data.fritzos.nspver
-            : null;
-        return osVersion;
-    });
-};
+/*
+ * General functions
+ */
 
 // get detailed device information (XML)
 module.exports.getDeviceListInfo = function(sid, options)
@@ -447,6 +437,39 @@ module.exports.getDeviceListVersion = function(sid, options)
             bufferedDevicelistInfoVersion = parser.xml2json(devicelistinfo).devicelist.version;
             return bufferedDevicelistInfoVersion;
         });
+};
+
+// get single device
+module.exports.getDevice = function(sid, ain, options)
+{
+    /* jshint laxbreak:true */
+    var devicelist = options && options.devicelist
+        ? Promise.resolve(options.devicelist)
+        : module.exports.getDeviceList(sid, options);
+
+    return devicelist.then((devices) => {
+        var device = devices.find(function(device) {
+            return device.identifier.replace(/\s/g, '') == ain;
+        });
+
+        return device || Promise.reject();
+    });
+};
+
+// get name of any device
+module.exports.getDeviceName = function(sid, ain, options)
+{
+    return module.exports.getDevice(sid, ain, options).then((device) => {
+        return device.name;
+    });
+};
+
+// get id of any device
+module.exports.getDeviceId = function(sid, ain, options)
+{
+    return module.exports.getDevice(sid, ain, options).then((device) => {
+        return device.id;
+    });
 };
 
 // get AINs by a functionmask from fritzbox or from given options.devicelist
@@ -481,33 +504,40 @@ module.exports.getListByFunction = function(sid, options, bit)
     });
 };
 
-// get single device
-module.exports.getDevice = function(sid, ain, options)
+// get AINs of all dect heater controls from fritzbox or from given options.devicelist
+module.exports.getValveList = function(sid, options)
 {
-    /* jshint laxbreak:true */
-    var deviceList = options && options.deviceList
-        ? Promise.resolve(options.deviceList)
-        : module.exports.getDeviceList(sid, options);
-
-    return deviceList.then(function(devices) {
-        var device = devices.find(function(device) {
-            return device.identifier.replace(/\s/g, '') == ain;
-        });
-
-        return device || Promise.reject();
-    });
+    return module.exports.getListByFunction(sid, options, module.exports.FUNCTION_THERMOSTAT);
 };
 
-// get name of any device
-module.exports.getDeviceName = function(sid, ain, options)
+// get AINs of all switch supported devices from fritzbox or from given options.devicelist
+module.exports.getSwitchList = function(sid, options)
 {
-    return module.exports.getDevice(sid, ain, options).name;
+    return module.exports.getListByFunction(sid, options, module.exports.FUNCTION_OUTLET);
 };
 
 // get AINs of all temperature supported devices from fritzbox or from given options.devicelist */
-module.exports.getTemperatureSensorsList = function(sid, options)
+module.exports.getTemperatureSensorList = function(sid, options)
 {
     return module.exports.getListByFunction(sid, options, module.exports.FUNCTION_TEMPERATURESENSOR);
+};
+
+// get AINs of all all energy meters from fritzbox or from given options.devicelist */
+module.exports.getEnergyMeterList = function(sid, options)
+{
+    return module.exports.getListByFunction(sid, options, module.exports.FUNCTION_ENERGYMETER);
+};
+
+// get AINs of all dect repeaters from fritzbox or from given options.devicelist
+module.exports.getDectRepeaterList = function(sid, options)
+{
+    return module.exports.getListByFunction(sid, options, module.exports.FUNCTION_DECTREPEATER);
+};
+
+// get AINs of all all alarm supported devices from fritzbox or from given options.devicelist
+module.exports.getAlarmList = function(sid, options)
+{
+    return module.exports.getListByFunction(sid, options, module.exports.FUNCTION_ALARM);
 };
 
 // get temperature- both switches and thermostats are supported, but not powerline modules
@@ -522,7 +552,7 @@ module.exports.getTemperature = function(sid, ain, options)
 module.exports.getPresence = function(sid, ain, options)
 {
     return module.exports.getDevice(sid, ain, options).then(function(device) {
-        return !!device.presence;
+        return device.present === AVM_TRUE;
     });
 };
 
@@ -531,14 +561,8 @@ module.exports.getPresence = function(sid, ain, options)
  * Switches
  */
 
-// get AINs of all switch supported devices from fritzbox or from given options.devicelist
-module.exports.getSwitchList = function(sid, options)
-{
-    return module.exports.getListByFunction(sid, options, module.exports.FUNCTION_OUTLET);
-};
-
 // get switch list direct from fritzbox
-module.exports.getSwitchList = function(sid, options)
+module.exports.getOutletList = function(sid, options)
 {
     return executeCommand(sid, 'getswitchlist', null, options).then(function(res) {
         // force empty array on empty result
@@ -608,12 +632,6 @@ module.exports.getSwitchName = function(sid, ain, options)
  * Thermostats
  */
 
-// get AINs of all dect heater controls from fritzbox or from given options.devicelist
-module.exports.getValveList = function(sid, options)
-{
-    return module.exports.getListByFunction(sid, options, module.exports.FUNCTION_THERMOSTAT);
-};
-
 // get the thermostats
 module.exports.getThermostatList = function(sid, options)
 {
@@ -653,7 +671,7 @@ module.exports.getTempComfort = function(sid, ain, options)
     });
 };
 
-// get battery charge - not part of Fritz API
+// get battery charge - not part of Fritz API // need admin rights :-(
 module.exports.getBatteryCharge = function(sid, ain, options)
 {
     return module.exports.getDevice(sid, ain, options).then(function(device) {
@@ -680,43 +698,11 @@ module.exports.getBatteryCharge = function(sid, ain, options)
 
 
 /*
- * Dect Repeaters
- */
-
-// get AINs of all dect repeaters from fritzbox or from given options.devicelist
-module.exports.getDectRepeaterList = function(sid, options)
-{
-    return module.exports.getListByFunction(sid, options, module.exports.FUNCTION_DECTREPEATER);
-};
-
-
-/*
- * Energy
- */
-
-// get AINs of all all energy meters from fritzbox or from given options.devicelist */
-module.exports.getEnergyMeterList = function(sid, options)
-{
-    return module.exports.getListByFunction(sid, options, module.exports.FUNCTION_ENERGYMETER);
-};
-
-
-/*
- * Alarms
- */
-
-// get AINs of all all alarm supported devices from fritzbox or from given options.devicelist
-module.exports.getAlarmList = function(sid, options)
-{
-    return module.exports.getListByFunction(sid, options, module.exports.FUNCTION_ALARM);
-};
-
-
-/*
  * WLAN
  */
 
 // get guest WLAN settings - not part of Fritz API
+// ***deprecated*** advise to use https://www.npmjs.com/package/tr-O64 (https://github.com/soef/tr-064/)
 module.exports.getGuestWlan = function(sid, options)
 {
     return executeCommand(sid, null, null, options, '/wlan/guest_access.lua?0=0').then(function(body) {
@@ -725,6 +711,7 @@ module.exports.getGuestWlan = function(sid, options)
 };
 
 // set guest WLAN settings - not part of Fritz API
+// ***deprecated*** advise to use https://www.npmjs.com/package/tr-O64 (https://github.com/soef/tr-064/)
 module.exports.setGuestWlan = function(sid, enable, options)
 {
     /* jshint laxbreak:true */
@@ -761,3 +748,61 @@ module.exports.setGuestWlan = function(sid, enable, options)
         });
     });
 };
+
+/**
+ * ***deprecated***
+ * Parse guest WLAN form settings
+ */
+function parseHTML(html)
+{
+    var $ = cheerio.load(html);
+    var form = $('form');
+    var settings = {};
+
+    $('input', form).each(function(i, elem) {
+        var val;
+        var name = $(elem).attr('name');
+        if (!name) return;
+
+        switch ($(elem).attr('type')) {
+            case 'checkbox':
+                val = $(elem).attr('checked') == 'checked';
+                break;
+            default:
+                val = $(elem).val();
+        }
+        settings[name] = val;
+    });
+
+    $('select option[selected=selected]', form).each(function(i, elem) {
+        var val = $(elem).val();
+        var name = $(elem).parent().attr('name');
+        settings[name] = val;
+    });
+
+    return settings;
+}
+
+// get OS version
+// ***deprecated*** advise to use https://www.npmjs.com/package/tr-O64 (https://github.com/soef/tr-064/) via modul UserInterface (userifSCPD.pdf)
+module.exports.getOSVersion = function(sid, options)
+{
+    var req = {
+        method: 'POST',
+        form: {
+            sid: sid,
+            xhr: 1,
+            page: 'overview'
+        }
+    };
+
+    /* jshint laxbreak:true */
+    return httpRequest('/data.lua', req, options).then(function(body) {
+        var json = JSON.parse(body);
+        var osVersion = json.data && json.data.fritzos && json.data.fritzos.nspver
+            ? json.data.fritzos.nspver
+            : null;
+        return osVersion;
+    });
+};
+

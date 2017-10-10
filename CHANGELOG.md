@@ -1,5 +1,16 @@
+## 0.10.0
+- bugfixes: getPresence (always returned false)
+
+- extension: MIN/MAX/ON/OFF TEMPS are now accessible in functional and oo-api
+- extension: AVM TRUE/FALSE are now accessible in functional and oo-api
+- extension: temp2api that it will use ON/OFF at levels above 28°C / below 8°C
+- extension: temp2api allows no also uppercase strings (ON/OFF) and AVM TRUE/FALSE
+
+- dev: added testcases for all functions - details are explained in testdir ./test
+- dev: travis now performs static code check of testcases
+
 ## 0.9.6 
-- bugfixed OO bitfunctions in object
+- bugfixed bitfunctions in object-api
 
 - moved jslint to pretest
 - added first testcase (mocha+chai based)

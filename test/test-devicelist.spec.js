@@ -1,5 +1,6 @@
 "use strict";
 /* jshint esversion: 6 */
+/* jshint -W030 */ //allow Expected an assignment or function call and instead saw an expression
 /* jslint node: true */
 /*global describe, it, before, beforeEach, after, afterEach */
 
@@ -25,7 +26,7 @@ describe('.getDeviceList [' + cfg.getTestmode() + ']', function () {
             it('with stubbed', (done) => {
                 fritzapi.getDeviceList().then( (devicelist) => {
                     devicelist.should.be.an('array');
-                    var test = cfg.getDevicelistInfoSinon().should.have.been.calledOnce;
+                    cfg.getDevicelistInfoSinon().should.have.been.calledOnce;
                     fritzapi.getDeviceListVersion().then( (version) => {
                         cfg.readValue(['devicelist', 'version']).should.be.equal(version);
                     }).then(done, done);
@@ -37,7 +38,7 @@ describe('.getDeviceList [' + cfg.getTestmode() + ']', function () {
                 fritzapi.getSessionID(cfg.readValue(['user']), cfg.readValue(['pwd']), options).then((sid) => {
                     fritzapi.getDeviceList(sid, options).then((devicelist) => {
                         devicelist.should.be.an('array');
-                        var test = cfg.getDevicelistInfoStub().should.have.been.calledTwice;
+                        cfg.getDevicelistInfoStub().should.have.been.calledTwice;
                         fritzapi.getDeviceListVersion(sid, options).then((version) => {
                             cfg.readValue(['devicelist', 'version']).should.be.equal(version);
                         }).then(done, done);
@@ -61,7 +62,7 @@ describe('.getDeviceList [' + cfg.getTestmode() + ']', function () {
         it('receive devices', (done) => { //independent from login data :-)
             fritz.getDeviceList(cfg.readValue(['options'])).then( (devicelist) => {
                 devicelist.should.be.an('array');
-                var test = cfg.getDevicelistInfoSinon().should.have.been.calledOnce;
+                cfg.getDevicelistInfoSinon().should.have.been.calledOnce;
                 fritz.getDeviceListVersion().then( (version) => {
                     cfg.readValue(['devicelist', 'version']).should.be.equal(version);
                 }).then(done, done);

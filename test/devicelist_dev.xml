@@ -36,7 +36,7 @@ version="develop"
         <present>0</present>
         <name>Steckdose manuell offline</name>
         <switch>
-            <state>0</state>s
+            <state>0</state>
             <mode>manuell</mode>
             <lock>1</lock>
             <devicelock>1</devicelock>
@@ -53,36 +53,36 @@ version="develop"
 
     <!-- 4 dummy alert devices -->
     <!-- 1st device is named cache as API supports no version and change would be a major release... -->
-    <device identifier="0000 0000001" id="19" functionbitmask="0" fwversion="03.33" manufacturer="???" productname="dummy alert">
+    <device identifier="0000 0000001" id="19" functionbitmask="16" fwversion="03.33" manufacturer="???" productname="dummy alert">
         <present>0</present>
         <name>_cached_</name>
         <alert>
             <state>0</state>
         </alert>
     </device>
-    <device identifier="0000 0000002" id="20" functionbitmask="0" fwversion="03.33" manufacturer="???" productname="dummy alert">
-        <present>0</present>
+    <device identifier="0000 0000002" id="20" functionbitmask="16" fwversion="03.33" manufacturer="???" productname="dummy alert">
+        <present>1</present>
         <name>Alert test Device #2</name>
         <alert>
             <state>0</state>
         </alert>
     </device>
-    <device identifier="0000 0000003" id="21" functionbitmask="0" fwversion="03.33" manufacturer="???" productname="dummy alert">
+    <device identifier="0000 0000003" id="21" functionbitmask="16" fwversion="03.33" manufacturer="???" productname="dummy alert">
         <present>0</present>
         <name>Alert test Device #3</name>
         <alert>
             <state>1</state>
         </alert>
     </device>
-    <device identifier="0000 0000004" id="22" functionbitmask="0" fwversion="03.33" manufacturer="???" productname="dummy alert">
-        <present>0</present>
+    <device identifier="0000 0000004" id="22" functionbitmask="16" fwversion="03.33" manufacturer="???" productname="dummy alert">
+        <present>1</present>
         <name>Alert test Device #4</name>
         <alert>
             <state>1</state>
         </alert>
     </device>
 
-    <!-- 2 custom heater elements -->
+    <!-- 3 custom heater elements -->
     <device identifier="00000 0063088" id="25" functionbitmask="320" fwversion="03.54" manufacturer="AVM" productname="Comet DECT">
         <present>1</present>
         <name>HK XXX</name>
@@ -122,6 +122,29 @@ version="develop"
             <devicelock>0</devicelock>
             <errorcode>0</errorcode>
             <batterylow>0</batterylow>
+            <nextchange>
+                <endperiod>0</endperiod>
+                <tchange>40</tchange>
+            </nextchange>
+        </hkr>
+    </device>
+
+    <device identifier="00000 0040185" id="27" functionbitmask="320" fwversion="03.55" manufacturer="AVM" productname="Comet DECT">
+        <present>0</present>
+        <name>HK ZZZ</name>
+        <temperature>
+            <celsius>201</celsius>
+            <offset>0.5</offset>
+        </temperature>
+        <hkr>
+            <tist>40</tist>
+            <tsoll>28</tsoll>
+            <absenk>28</absenk>
+            <komfort>40</komfort>
+            <lock>1</lock>
+            <devicelock>0</devicelock>
+            <errorcode>2</errorcode>
+            <batterylow>1</batterylow>
             <nextchange>
                 <endperiod>0</endperiod>
                 <tchange>40</tchange>

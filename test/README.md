@@ -11,7 +11,7 @@ Tests can be configured via `config.js` to run as
 
 All tests cover both API functionallity
 * Functional API
-* {2do} OO based API
+* OO based API
 
 Tests are performed via <img src="http://cldup.com/xFVFxOioAU.svg" height="17px"/> [mocha](http://mochajs.org/). 
 Test design via <img src="http://sinonjs.org/assets/images/logo.png" height="17px"/> [sinon](http://sinonjs.org/) and <img src="http://chaijs.com/img/chai-logo.png" height="17px"/> [chai](http://chaijs.com/) and chai plugin [sinon-chai](http://chaijs.com/plugins/sinon-chai/) *DevHint* Testing promisified functions `require('bluebird')` and assign to sinon `usingPromise(bluebird.Promise)`.
@@ -24,17 +24,17 @@ Stubbed XML `devicelist_cache_stub.xml` is to test (devicelist/device) caching
 ## Stub
 
 ### Testcases:
-- [x] **bitfunctions**: Check that all bit functions provide a value different from 0. Wxtend on new bitfunction(s)
-- [x] **devicelist**: Load the (currently two) stubbed XML files and carry out devcelist specific tests.
-- [x] **getListByFunction**: Test the generic `getListByFunction` and all related functions like `getSwitchList` and `getValveList` etc. extend on new devicetypes
-- [x] **internals**: check internal used functions for exepcted baviour
+- [x] **bitfunctions**: Check that all bit functions provide a value different from 0. [Extend on new bitfunction(s)]
+- [x] **devicelist**: Test against stubbed or live XML Info. [extend on new device]
+- [x] **getListByFunction**: Test the generic `getListByFunction` and all related functions like `getSwitchList` and `getValveList` etc. [extend on new devicetypes]
+- [x] **internals**: check internal used functions for exepcted baviour -> 2do `executeCommand` `httpRequest`
 
-- [ ] device: getDevice
-- [ ] devicename: getDeviceName 
+- [x] device: getDevice
+- [x] devicename: getDeviceName 
+- [x] deviceid: getDeviceId
 
 - [ ] sid: getSID
 
-- [ ] osversion: getOSVersion
 
 - [ ] devicelistinfo: getDeviceListInfo
 
@@ -50,10 +50,13 @@ Stubbed XML `devicelist_cache_stub.xml` is to test (devicelist/device) caching
 - [ ] getTempTarget
 - [ ] getTempNight
 - [ ] getTempComfort
-- [ ] getBatteryCharge
-- [ ] getGuestWlan
 
 - [ ] setSwitchOn
 - [ ] setSwitchOff
 - [ ] setTempTarget
+
+- [ ] getBatteryCharge
+
+- [ ] osversion: getOSVersion
 - [ ] setGuestWlan
+- [ ] getGuestWlan
